@@ -19,14 +19,27 @@ import {
   UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-const MOODLE_BASE_URL = process.env.NEXT_PUBLIC_MOODLE_URL || 'https://numerator-finished-backshift.ngrok-free.dev/moodle';
+
+const getMoodleBaseUrl = () => {
+  const raw = (process.env.NEXT_PUBLIC_MOODLE_URL || 'https://numerator-finished-backshift.ngrok-free.dev/moodle')
+    .trim()
+    .replace(/^\[|\]$/g, '')
+    .replace(/\/+$/, '');
+
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    return raw;
+  }
+  return `https://${raw}`;
+};
+
+const MOODLE_BASE_URL = getMoodleBaseUrl();
 
 const initialPrograms = [
   {
     id: 1,
     title: "Ingeniería en Inteligencia Artificial & Deep Learning",
     category: "ingenierias",
-    moodleUrl: "http://localhost/moodle/course/view.php?id=2",
+    moodleUrl: `${MOODLE_BASE_URL}/course/view.php?id=2`,
     level: "Avanzado",
     duration: "180 Horas",
     students: "1,420",
@@ -39,7 +52,7 @@ const initialPrograms = [
     id: 2,
     title: "Diplomado en Arquitectura Cloud Native & DevOps",
     category: "diplomados",
-    moodleUrl: "http://localhost/moodle/",
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     level: "Avanzado",
     duration: "120 Horas",
     students: "980",
@@ -52,7 +65,7 @@ const initialPrograms = [
     id: 3,
     title: "Certificación Internacional en UI/UX & Design Systems",
     category: "certificaciones",
-    moodleUrl: "http://localhost/moodle/",
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     level: "Principiante",
     duration: "90 Horas",
     students: "1,890",
@@ -65,7 +78,7 @@ const initialPrograms = [
     id: 4,
     title: "Licenciatura en Desarrollo de Software & Sistemas Distribuidos",
     category: "licenciaturas",
-    moodleUrl: "http://localhost/moodle/",
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     level: "Intermedio",
     duration: "240 Horas",
     students: "2,100",
@@ -78,7 +91,7 @@ const initialPrograms = [
     id: 5,
     title: "Certificación en Ciberseguridad & Ethical Hacking",
     category: "certificaciones",
-    moodleUrl: "http://localhost/moodle/",
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     level: "Avanzado",
     duration: "110 Horas",
     students: "850",
@@ -91,7 +104,7 @@ const initialPrograms = [
     id: 6,
     title: "Diplomado en Big Data & Business Analytics",
     category: "diplomados",
-    moodleUrl: "http://localhost/moodle/",
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     level: "Intermedio",
     duration: "130 Horas",
     students: "1,150",
@@ -239,7 +252,7 @@ export default function App() {
                   Mi Panel
                 </Link>
                 <a
-                  href="http://localhost/moodle/"
+                  href={`${MOODLE_BASE_URL}/`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-600 rounded-lg shadow-sm transition-all flex items-center gap-1.5"
@@ -324,7 +337,7 @@ export default function App() {
               COMIENZA AHORA <ArrowRight className="w-4 h-4" />
             </button>
             <a
-              href="http://localhost/moodle/"
+              href={`${MOODLE_BASE_URL}/`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 text-sm shadow-sm"
@@ -572,7 +585,7 @@ export default function App() {
           <div>
             <h4 className="text-sm font-bold text-white mb-4">Plataforma</h4>
             <ul className="space-y-2 text-slate-400">
-              <li><a href="http://localhost/moodle/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Campus Moodle LMS</a></li>
+              <li><a href={`${MOODLE_BASE_URL}/`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Campus Moodle LMS</a></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Acceso a Estudiantes</Link></li>
               <li><button onClick={() => navigateToCategory('todos')} className="hover:text-white transition-colors cursor-pointer">Oferta Académica</button></li>
               <li><button onClick={() => scrollToSection('nosotros')} className="hover:text-white transition-colors cursor-pointer">¿Por qué elegirnos?</button></li>
@@ -614,15 +627,14 @@ export default function App() {
                 href={selectedProgram.moodleUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-600 rounded-xl"
+                className="px-4 py-2 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-600 rounded-xl shadow-sm transition-all"
               >
-                Ir a Moodle
+                Ir al Curso en Moodle
               </a>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

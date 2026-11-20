@@ -20,7 +20,19 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-const MOODLE_BASE_URL = process.env.NEXT_PUBLIC_MOODLE_URL || 'http://localhost/moodle';
+const getMoodleBaseUrl = () => {
+  const raw = (process.env.NEXT_PUBLIC_MOODLE_URL || 'http://localhost/moodle')
+    .trim()
+    .replace(/^\[|\]$/g, '')
+    .replace(/\/+$/, '');
+
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    return raw;
+  }
+  return `https://${raw}`;
+};
+
+const MOODLE_BASE_URL = getMoodleBaseUrl();
 
 const availableCoursesCatalog = [
   {
@@ -78,7 +90,6 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'mis-cursos' | 'disponibles' | 'historial'>('mis-cursos');
 
-  // Inicia vacío para cuentas nuevas
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [academicHistory, setAcademicHistory] = useState<HistoryItem[]>([]);
 
@@ -134,7 +145,6 @@ export default function StudentDashboard() {
     }
   };
 
-  // Simula o sincroniza la calificación obtenida al completar el curso en Moodle
   const handleCompleteCourse = (course: any, grade: number) => {
     setEnrolledCourses((prev) =>
       prev.map((c) =>
@@ -164,7 +174,6 @@ export default function StudentDashboard() {
     });
   };
 
-  // Cálculo dinámico del promedio general
   const gradedCourses = enrolledCourses.filter((c) => typeof c.grade === 'number');
   const allGrades = [
     ...academicHistory.map((h) => h.grade),
