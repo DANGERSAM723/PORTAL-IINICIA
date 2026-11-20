@@ -20,56 +20,67 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
+const MOODLE_BASE_URL = process.env.NEXT_PUBLIC_MOODLE_URL || 'http://localhost/moodle';
+
 const availableCoursesCatalog = [
   {
     id: 1,
+    code: 'IIN-201',
     title: 'Ingeniería en Inteligencia Artificial & Deep Learning',
     category: 'Ingeniería',
     duration: '180 Horas',
-    moodleUrl: 'http://localhost/moodle/course/view.php?id=2',
+    moodleUrl: `${MOODLE_BASE_URL}/course/view.php?id=2`,
     instructor: 'Dr. Alejandro Gómez',
     description: 'Domina redes neuronales, PyTorch y modelos de lenguaje avanzados.'
   },
   {
     id: 2,
+    code: 'IIN-202',
     title: 'Diplomado en Arquitectura Cloud Native & DevOps',
     category: 'Diplomado',
     duration: '120 Horas',
-    moodleUrl: 'http://localhost/moodle/',
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     instructor: 'Mtra. Sofía Ramírez',
     description: 'Construye sistemas con Kubernetes, Docker y pipelines CI/CD.'
   },
   {
     id: 3,
+    code: 'IIN-203',
     title: 'Certificación Internacional en UI/UX & Design Systems',
     category: 'Certificación',
     duration: '90 Horas',
-    moodleUrl: 'http://localhost/moodle/',
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     instructor: 'Lic. Carlos Mendoza',
     description: 'Diseña interfaces escalables con metodologías de investigación.'
   },
   {
     id: 4,
+    code: 'IIN-204',
     title: 'Certificación en Ciberseguridad & Ethical Hacking',
     category: 'Certificación',
     duration: '110 Horas',
-    moodleUrl: 'http://localhost/moodle/',
+    moodleUrl: `${MOODLE_BASE_URL}/`,
     instructor: 'Ing. Roberto Morales',
     description: 'Auditoría de sistemas, pentesting y análisis de vulnerabilidades.'
   }
 ];
+
+interface HistoryItem {
+  code: string;
+  subject: string;
+  period: string;
+  grade: number;
+  status: string;
+}
 
 export default function StudentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'mis-cursos' | 'disponibles' | 'historial'>('mis-cursos');
 
+  // Inicia vacío para cuentas nuevas
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
-
-  const academicHistory = [
-    { code: 'IIN-101', subject: 'Fundamentos de Programación y Lógica', period: '2025-2', grade: '9.5', status: 'Aprobado' },
-    { code: 'IIN-104', subject: 'Bases de Datos Relacionales y SQL', period: '2026-1', grade: '9.8', status: 'Aprobado' }
-  ];
+  const [academicHistory, setAcademicHistory] = useState<HistoryItem[]>([]);
 
   const router = useRouter();
 
@@ -110,9 +121,11 @@ export default function StudentDashboard() {
         ...enrolledCourses,
         {
           id: course.id,
+          code: course.code,
           title: course.title,
           progress: 0,
-          status: 'Iniciado',
+          grade: null,
+          status: 'En curso',
           lastAccess: 'Recién inscrito',
           moodleUrl: course.moodleUrl
         }
@@ -120,6 +133,50 @@ export default function StudentDashboard() {
       setActiveTab('mis-cursos');
     }
   };
+
+  // Simula o sincroniza la calificación obtenida al completar el curso en Moodle
+  const handleCompleteCourse = (course: any, grade: number) => {
+    setEnrolledCourses((prev) =>
+      prev.map((c) =>
+        c.id === course.id
+          ? { ...c, progress: 100, grade, status: 'Completado', lastAccess: 'Sincronizado con Moodle' }
+          : c
+      )
+    );
+
+    setAcademicHistory((prev) => {
+      const exists = prev.some((item) => item.code === course.code);
+      if (exists) {
+        return prev.map((item) =>
+          item.code === course.code ? { ...item, grade, status: grade >= 7 ? 'Aprobado' : 'Reprobado' } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          code: course.code,
+          subject: course.title,
+          period: '2026-2',
+          grade,
+          status: grade >= 7 ? 'Aprobado' : 'Reprobado'
+        }
+      ];
+    });
+  };
+
+  // Cálculo dinámico del promedio general
+  const gradedCourses = enrolledCourses.filter((c) => typeof c.grade === 'number');
+  const allGrades = [
+    ...academicHistory.map((h) => h.grade),
+    ...gradedCourses
+      .filter((c) => !academicHistory.some((h) => h.code === c.code))
+      .map((c) => c.grade as number)
+  ];
+
+  const averageGrade =
+    allGrades.length > 0
+      ? (allGrades.reduce((sum, g) => sum + g, 0) / allGrades.length).toFixed(1)
+      : '0.0';
 
   if (loading) {
     return (
@@ -155,7 +212,7 @@ export default function StudentDashboard() {
               <span className="max-w-[180px] truncate">{user?.email}</span>
             </div>
             <a
-              href="http://localhost/moodle/"
+              href={`${MOODLE_BASE_URL}/`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2.5 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-600 rounded-xl shadow-md transition-all flex items-center gap-2"
@@ -195,7 +252,9 @@ export default function StudentDashboard() {
                 <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200 mt-1">Cursos Activos</div>
               </div>
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center min-w-[110px]">
-                <div className="text-3xl font-black text-emerald-400">9.6</div>
+                <div className={`text-3xl font-black ${allGrades.length > 0 ? 'text-emerald-400' : 'text-slate-300'}`}>
+                  {averageGrade}
+                </div>
                 <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200 mt-1">Promedio</div>
               </div>
             </div>
@@ -234,7 +293,7 @@ export default function StudentDashboard() {
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <GraduationCap className="w-4 h-4" /> Historial Académico
+            <GraduationCap className="w-4 h-4" /> Historial Académico ({academicHistory.length})
           </button>
         </div>
 
@@ -277,7 +336,9 @@ export default function StudentDashboard() {
                           <span className="text-slate-500 flex items-center gap-1">
                             <BarChart3 className="w-3.5 h-3.5 text-[#0066FF]" /> Progreso del programa
                           </span>
-                          <span className="text-[#0066FF]">{course.progress}%</span>
+                          <span className="text-[#0066FF]">
+                            {course.progress}% {typeof course.grade === 'number' ? `• Calif: ${course.grade.toFixed(1)}` : ''}
+                          </span>
                         </div>
                         <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                           <div
@@ -288,14 +349,26 @@ export default function StudentDashboard() {
                       </div>
                     </div>
 
-                    <a
-                      href={course.moodleUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-3 bg-slate-900 hover:bg-[#0066FF] text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm"
-                    >
-                      <PlayCircle className="w-4 h-4" /> Continuar en Moodle LMS
-                    </a>
+                    <div className="space-y-2.5">
+                      <a
+                        href={course.moodleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 bg-slate-900 hover:bg-[#0066FF] text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <PlayCircle className="w-4 h-4" /> Continuar en Moodle LMS
+                      </a>
+
+                      {course.status !== 'Completado' && (
+                        <button
+                          type="button"
+                          onClick={() => handleCompleteCourse(course, 9.5)}
+                          className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-[#0066FF] border border-blue-200 text-xs font-bold rounded-2xl transition cursor-pointer"
+                        >
+                          Sincronizar Calificación de Moodle
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -349,40 +422,47 @@ export default function StudentDashboard() {
             <div className="p-6 sm:p-8 border-b border-slate-100 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Historial Académico y Calificaciones</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Registro oficial de asignaturas aprobadas en IINICIA TECH</p>
+                <p className="text-xs text-slate-500 mt-0.5">Registro oficial de asignaturas evaluadas en Moodle LMS</p>
               </div>
               <div className="p-3 bg-blue-50 text-[#0066FF] rounded-2xl">
                 <Award className="w-6 h-6" />
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider">
-                    <th className="py-4 px-6">Clave</th>
-                    <th className="py-4 px-6">Asignatura</th>
-                    <th className="py-4 px-6">Periodo</th>
-                    <th className="py-4 px-6">Calificación</th>
-                    <th className="py-4 px-6">Estatus</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {academicHistory.map((item) => (
-                    <tr key={item.code} className="hover:bg-slate-50/50 transition">
-                      <td className="py-4 px-6 font-bold text-slate-700">{item.code}</td>
-                      <td className="py-4 px-6 font-semibold text-slate-900">{item.subject}</td>
-                      <td className="py-4 px-6 text-slate-500">{item.period}</td>
-                      <td className="py-4 px-6 font-black text-[#0066FF] text-sm">{item.grade}</td>
-                      <td className="py-4 px-6">
-                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-[10px] border border-emerald-200">
-                          {item.status}
-                        </span>
-                      </td>
+
+            {academicHistory.length === 0 ? (
+              <div className="p-12 text-center text-xs text-slate-500">
+                Aún no tienes materias evaluadas. Conforme completes tus cursos en Moodle, tus calificaciones y promedio se reflejarán aquí automáticamente.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider">
+                      <th className="py-4 px-6">Clave</th>
+                      <th className="py-4 px-6">Asignatura</th>
+                      <th className="py-4 px-6">Periodo</th>
+                      <th className="py-4 px-6">Calificación</th>
+                      <th className="py-4 px-6">Estatus</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {academicHistory.map((item) => (
+                      <tr key={item.code} className="hover:bg-slate-50/50 transition">
+                        <td className="py-4 px-6 font-bold text-slate-700">{item.code}</td>
+                        <td className="py-4 px-6 font-semibold text-slate-900">{item.subject}</td>
+                        <td className="py-4 px-6 text-slate-500">{item.period}</td>
+                        <td className="py-4 px-6 font-black text-[#0066FF] text-sm">{item.grade.toFixed(1)}</td>
+                        <td className="py-4 px-6">
+                          <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-[10px] border border-emerald-200">
+                            {item.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </main>

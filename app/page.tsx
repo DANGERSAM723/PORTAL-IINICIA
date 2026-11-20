@@ -19,6 +19,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+const MOODLE_BASE_URL = process.env.NEXT_PUBLIC_MOODLE_URL || 'https://numerator-finished-backshift.ngrok-free.dev/moodle';
 
 const initialPrograms = [
   {
