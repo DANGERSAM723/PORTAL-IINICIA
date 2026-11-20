@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
 
-  // PASO 1: Validar credenciales y enviar el Magic Link al correo
   const handleVerifyCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -30,10 +29,8 @@ export default function LoginPage() {
 
       if (error) throw new Error('Correo o contraseña incorrectos.');
 
-      // Cerramos sesión temporal para forzar el flujo seguro hacia el dashboard mediante enlace
       await supabase.auth.signOut();
 
-      // Enviamos el Magic Link oficial de Supabase
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -59,8 +56,19 @@ export default function LoginPage() {
           <ArrowLeft className="w-4 h-4" /> Volver al Inicio
         </Link>
 
-        <div className="flex items-center justify-center gap-2.5 mb-2">
-          <ShieldCheck className="w-7 h-7 text-[#0066FF]" />
+        {/* LOGO IINICIA */}
+        <div className="flex justify-center mb-5">
+          <Link href="/">
+            <img
+              src="/logo-iinicia.jpg"
+              alt="IINICIA - Instituto de Innovación y Ciencias Aplicadas"
+              className="h-16 w-auto object-contain"
+            />
+          </Link>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <ShieldCheck className="w-6 h-6 text-[#0066FF]" />
           <h2 className="text-2xl font-black text-slate-900">Iniciar Sesión</h2>
         </div>
         <p className="text-slate-500 text-center text-xs mb-6">

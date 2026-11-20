@@ -15,7 +15,6 @@ import {
   UserCheck,
   GraduationCap,
   BarChart3,
-  Home,
   BookMarked,
   Sparkles
 } from 'lucide-react';
@@ -64,8 +63,7 @@ export default function StudentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'mis-cursos' | 'disponibles' | 'historial'>('mis-cursos');
-  
-  // Iniciamos vacío para que las cuentas nuevas no tengan cursos pre-cargados
+
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
 
   const academicHistory = [
@@ -138,13 +136,16 @@ export default function StudentDashboard() {
       {/* BARRA SUPERIOR */}
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <svg className="w-8 h-8 text-[#0066FF]" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M30 10C18.9543 10 10 18.9543 10 30C10 41.0457 18.9543 50 30 50C40 50 46 41 50 30C54 19 60 10 70 10C81.0457 10 90 18.9543 90 30C90 41.0457 81.0457 50 70 50C60 50 54 41 50 30C46 19 40 10 30 10Z" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-                <circle cx="50" cy="30" r="5" fill="#00D2FF" />
-              </svg>
-              <span className="text-xl font-black text-slate-900">ÍNÍCÍÁ <span className="text-xs px-2 py-0.5 bg-blue-50 text-[#0066FF] border border-blue-200 rounded-lg">PANEL</span></span>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-3">
+              <img
+                src="/logo-iinicia.jpg"
+                alt="IINICIA - Instituto de Innovación y Ciencias Aplicadas"
+                className="h-11 w-auto object-contain"
+              />
+              <span className="text-xs px-2.5 py-0.5 bg-blue-50 text-[#0066FF] border border-blue-200 rounded-lg font-bold">
+                PANEL
+              </span>
             </Link>
           </div>
 

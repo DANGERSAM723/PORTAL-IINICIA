@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Search, 
-  Star, 
-  Users, 
-  Clock, 
-  ArrowRight, 
-  Server, 
-  X, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  Search,
+  Star,
+  Users,
+  Clock,
+  ArrowRight,
+  Server,
+  X,
+  Mail,
+  Phone,
+  MapPin,
   Check,
   Menu,
   LogOut,
@@ -137,7 +137,6 @@ export default function App() {
   const [emailInput, setEmailInput] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Capturar sesión y tokens de Supabase automáticamente al cargar
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -196,29 +195,20 @@ export default function App() {
 
   return (
     <div id="inicio" className="min-h-screen bg-white text-slate-800 font-sans selection:bg-[#0066FF] selection:text-white">
-      
+
       {/* NAVEGACIÓN SUPERIOR */}
       <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          <button 
-            onClick={() => scrollToSection('inicio')} 
+
+          <button
+            onClick={() => scrollToSection('inicio')}
             className="flex items-center gap-3 cursor-pointer text-left"
           >
-            <div className="flex items-center justify-center">
-              <svg className="w-10 h-10 text-[#0066FF]" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M30 10C18.9543 10 10 18.9543 10 30C10 41.0457 18.9543 50 30 50C40 50 46 41 50 30C54 19 60 10 70 10C81.0457 10 90 18.9543 90 30C90 41.0457 81.0457 50 70 50C60 50 54 41 50 30C46 19 40 10 30 10Z" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-                <circle cx="50" cy="30" r="5" fill="#00D2FF" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black tracking-wider text-slate-900 flex items-center gap-1">
-                ÍNÍCÍÁ <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-[#0066FF] border border-blue-200 font-bold">TECH</span>
-              </span>
-              <span className="text-[10px] text-slate-500 font-medium tracking-tight -mt-1">
-                Instituto de Innovación y Ciencias Aplicadas
-              </span>
-            </div>
+            <img
+              src="/logo-iinicia.jpg"
+              alt="IINICIA - Instituto de Innovación y Ciencias Aplicadas"
+              className="h-12 w-auto object-contain"
+            />
           </button>
 
           {/* MENÚ DE ESCRITORIO ONE-PAGE */}
@@ -241,6 +231,12 @@ export default function App() {
                   <UserCheck className="w-4 h-4 text-emerald-600" />
                   <span className="max-w-[160px] truncate">{user.email}</span>
                 </div>
+                <Link
+                  href="/dashboard"
+                  className="px-3.5 py-2 text-xs font-bold text-[#0066FF] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all"
+                >
+                  Mi Panel
+                </Link>
                 <a
                   href="http://localhost/moodle/"
                   target="_blank"
@@ -259,14 +255,14 @@ export default function App() {
               </div>
             ) : (
               <>
-                <Link 
-                  href="/register" 
+                <Link
+                  href="/register"
                   className="hidden sm:flex items-center px-3.5 py-2 text-xs font-semibold text-[#0066FF] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all"
                 >
                   Crear Cuenta
                 </Link>
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="px-4 py-2 text-xs font-semibold text-white bg-[#0066FF] hover:bg-blue-600 rounded-lg shadow-md transition-all"
                 >
                   Iniciar Sesión
@@ -274,9 +270,8 @@ export default function App() {
               </>
             )}
 
-            {/* Botón hamburguesa móvil */}
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="xl:hidden p-2 text-slate-600 hover:text-[#0066FF] rounded-lg cursor-pointer"
               aria-label="Abrir menú"
             >
@@ -321,15 +316,15 @@ export default function App() {
             Tu educación comienza hoy. Accede a tu campus en Moodle LMS 24/7.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-            <button 
+            <button
               onClick={() => navigateToCategory('todos')}
               className="w-full sm:w-auto px-8 py-4 bg-[#0066FF] hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
             >
               COMIENZA AHORA <ArrowRight className="w-4 h-4" />
             </button>
-            <a 
-              href="http://localhost/moodle/" 
-              target="_blank" 
+            <a
+              href="http://localhost/moodle/"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 text-sm shadow-sm"
             >
@@ -349,7 +344,7 @@ export default function App() {
             </div>
             <div className="relative w-full md:w-80">
               <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
-              <input 
+              <input
                 type="text"
                 placeholder="Buscar programa..."
                 value={searchQuery}
@@ -384,15 +379,15 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPrograms.length > 0 ? (
               filteredPrograms.map((program) => (
-                <div 
+                <div
                   key={program.id}
                   className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col group"
                 >
                   <div className="relative h-48 overflow-hidden bg-slate-100">
-                    <img 
-                      src={program.image} 
+                    <img
+                      src={program.image}
                       alt={program.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md text-[#0066FF] text-[10px] font-bold rounded-full border border-slate-200 uppercase shadow-sm">
                       {program.category}
@@ -415,15 +410,15 @@ export default function App() {
                     </p>
 
                     <div className="pt-4 border-t border-slate-100 flex items-center gap-2">
-                      <button 
+                      <button
                         onClick={() => setSelectedProgram(program)}
                         className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all cursor-pointer"
                       >
                         Ver Detalle
                       </button>
-                      <a 
-                        href={program.moodleUrl} 
-                        target="_blank" 
+                      <a
+                        href={program.moodleUrl}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="px-4 py-2.5 bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold rounded-xl shadow-sm transition-all text-center"
                       >
@@ -532,15 +527,15 @@ export default function App() {
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Únete a nuestra comunidad</h2>
           <p className="text-xs text-slate-600 mb-6">Introduzca su dirección de correo electrónico para recibir noticias y ofertas académicas.</p>
           <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input 
-              type="email" 
+            <input
+              type="email"
               required
-              placeholder="Tu correo electrónico" 
+              placeholder="Tu correo electrónico"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               className="flex-1 px-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0066FF] shadow-sm"
             />
-            <button 
+            <button
               type="submit"
               className="px-6 py-3 bg-[#0066FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
             >
@@ -554,8 +549,12 @@ export default function App() {
       <footer id="contacto" className="bg-slate-900 text-slate-300 py-12 text-xs scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg font-black text-white">ÍNÍCÍÁ TECH</span>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/logo-iinicia.jpg"
+                alt="IINICIA"
+                className="h-10 w-auto object-contain bg-white p-1.5 rounded-lg"
+              />
             </div>
             <p className="text-slate-400 leading-relaxed pr-4">
               Tu educación comienza hoy, estés donde estés. El conocimiento que transforma tu vida está a tu alcance en todo momento.
@@ -598,18 +597,27 @@ export default function App() {
               <div className="text-xs font-bold text-[#0066FF]">Temas Clave:</div>
               {selectedProgram.features.map((f: string, i: number) => (
                 <div key={i} className="flex items-center gap-2 text-xs text-slate-700">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#0066FF]"></div> {f}
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#0066FF]" />
+                  <span>{f}</span>
                 </div>
               ))}
             </div>
-            <a 
-              href={selectedProgram.moodleUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full py-3 bg-[#0066FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md transition-all block text-center"
-            >
-              Ir a este Curso en Moodle
-            </a>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setSelectedProgram(null)}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer"
+              >
+                Cerrar
+              </button>
+              <a
+                href={selectedProgram.moodleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 text-xs font-bold text-white bg-[#0066FF] hover:bg-blue-600 rounded-xl"
+              >
+                Ir a Moodle
+              </a>
+            </div>
           </div>
         </div>
       )}

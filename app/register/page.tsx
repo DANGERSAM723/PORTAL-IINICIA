@@ -55,6 +55,17 @@ export default function RegisterPage() {
           <ArrowLeft className="w-4 h-4" /> Volver al Inicio
         </Link>
 
+        {/* LOGO IINICIA */}
+        <div className="flex justify-center mb-5">
+          <Link href="/">
+            <img
+              src="/logo-iinicia.jpg"
+              alt="IINICIA - Instituto de Innovación y Ciencias Aplicadas"
+              className="h-16 w-auto object-contain"
+            />
+          </Link>
+        </div>
+
         <h2 className="text-3xl font-black text-slate-900 text-center mb-1">Crear Cuenta</h2>
         <p className="text-slate-500 text-center text-xs mb-6">Regístrate en el portal académico IINICIA</p>
 
