@@ -22,11 +22,45 @@ export default function RegisterPage() {
     setSuccessMessage('');
 
     try {
+      const nameParts = fullName.trim().split(/\s+/);
+      const firstname = nameParts[0] || 'Estudiante';
+      const lastname = nameParts.slice(1).join(' ') || 'IINICIA';
+      const username = email
+        .split('@')[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, '');
+
+      const moodleRes = await fetch('/api/moodle/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          firstname,
+          lastname,
+          email: email.trim(),
+          courseId: 2,
+        }),
+      });
+
+      const moodleData = await moodleRes.json();
+
+      if (!moodleRes.ok || !moodleData.ok) {
+        throw new Error(
+          moodleData.error ||
+            'No se pudo crear la cuenta en Moodle. Verifica que tu contraseña tenga al menos 8 caracteres, mayúscula, minúscula, número y símbolo.'
+        );
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: {
+            full_name: fullName,
+            moodle_username: username,
+            moodle_user_id: moodleData.moodleUserId,
+          },
           emailRedirectTo: `${window.location.origin}/login`,
         },
       });
@@ -37,10 +71,12 @@ export default function RegisterPage() {
         await supabase.auth.signOut();
       }
 
-      setSuccessMessage('¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...');
+      setSuccessMessage(
+        `¡Cuenta creada y vinculada con Moodle (usuario: ${username})! Redirigiendo al inicio de sesión...`
+      );
       setTimeout(() => {
         router.push('/login');
-      }, 2000);
+      }, 2500);
     } catch (error: any) {
       setErrorMessage(error.message || 'No se pudo completar el registro.');
     } finally {
@@ -119,15 +155,15 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-[10px] font-bold tracking-wider uppercase text-slate-600 mb-1">
-              Contraseña (mínimo 6 caracteres)
+              Contraseña (mín. 8 caracteres, mayús, minús, número y símbolo)
             </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
               <input
                 type="password"
                 required
-                minLength={6}
-                placeholder="••••••••"
+                minLength={8}
+                placeholder="Ej. Alumno2026*"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
